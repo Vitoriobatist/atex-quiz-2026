@@ -1,0 +1,111 @@
+.det-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.det-header {
+  margin-bottom: 28px;
+}
+.det-header h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; }
+.det-desc       { color: #64748b; font-size: .95rem; margin-bottom: 8px; }
+.det-periodo {
+  display: inline-block;
+  padding: 3px 12px;
+  background: #eef4ff;
+  color: #1e3a8a;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.det-section {
+  background: #fff;
+  border: 2px solid #c9d4e9;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(2,6,23,.07);
+}
+
+.det-arquivos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.det-arquivo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: .9rem;
+  background: #f9fafb;
+}
+
+.det-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.det-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border: 1.5px dashed #3b82f6;
+  color: #3b82f6;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.det-upload-btn:hover { background: #eff6ff; }
+
+.det-muted { color: #64748b; font-size: .88rem; }
+
+.det-alunos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.det-aluno-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.det-aluno-item input[type="checkbox"] { accent-color: #3b82f6; width: 16px; height: 16px; }
+.det-aluno-item.checked { border-color: #3b82f6; background: #eff6ff; }
+.det-aluno-item:hover   { border-color: #3b82f6; }
+
+.det-aluno-nome  { font-weight: 600; font-size: .92rem; }
+.det-aluno-email { color: #64748b; font-size: .82rem; margin-left: auto; }
+
+.det-btn-salvar {
+  padding: 10px 22px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .2s;
+}
+.det-btn-salvar:hover { background: #2563eb; }
+
+.det-msg-ok  { color: #166b1a; font-size: .88rem; font-weight: 600; }
+.det-msg-err { color: #a00000; font-size: .88rem; font-weight: 600; }

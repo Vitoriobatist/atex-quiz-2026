@@ -1,0 +1,52 @@
+.disc-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.disc-page h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.disc-lista {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.disc-card {
+  position: relative;
+  background: #fcfdff;
+  border: 2px solid #e6edf7;
+  border-radius: 16px;
+  padding: 16px 56px 16px 18px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(2,6,23,.07);
+  transition: transform .12s, border-color .12s, background .12s;
+}
+.disc-card:hover { transform: translateY(-3px); border-color: #3b82f6; background: #fff; }
+
+.disc-card__nome { margin: 0 0 4px; font-size: 1.05rem; font-weight: 800; }
+.disc-card__desc { margin: 0; color: #64748b; font-size: .86rem; }
+
+.disc-card__trash {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.disc-voltar {
+  margin-top: 22px;
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: .95rem;
+}
+.disc-voltar:hover { text-decoration: underline; }

@@ -1,0 +1,102 @@
+.dash-main {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
+
+.dash-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dash-hero h1 { font-size: 1.7rem; font-weight: 800; }
+.dash-hero p  { color: var(--cinza-600); margin-top: 4px; }
+
+.dash-filtro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dash-filtro label { font-size: .9rem; font-weight: 600; }
+.dash-filtro select {
+  padding: 8px 12px;
+  border: 1.5px solid var(--cinza-200);
+  border-radius: 8px;
+  font-size: .9rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.chart-card {
+  background: #fff;
+  border: 2px solid #c9d4e9;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(2,6,23,.07);
+}
+.chart-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+
+.table-section h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 14px; }
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cinza-200);
+  font-size: .9rem;
+}
+th { font-weight: 700; background: #f6f7fb; }
+tr:hover td { background: #f9faff; }
+
+.aprove-red    { color: #c70000; font-weight: 600; }
+.aprove-yellow { color: #d18b00; font-weight: 600; }
+.aprove-green  { color: #0f8d2c; font-weight: 600; }
+
+.review-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: .3rem .8rem;
+  border-radius: 999px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 600;
+  transition: background .2s;
+}
+.review-btn:hover { background: #4338ca; }
+
+.review-exp {
+  font-size: .8rem;
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+.dash-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--azul);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background .2s;
+}
+.dash-btn:hover { background: #005de8; }
+
+@media (max-width: 768px) {
+  .dash-hero { flex-direction: column; }
+  .charts-grid { grid-template-columns: 1fr; }
+}
