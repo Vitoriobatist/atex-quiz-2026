@@ -1,206 +1,135 @@
-# Simpat.IA — Quiz Inteligente UNIFNAS
+# Base de Conhecimento — Agente de Suporte Simpat.IA
 
-Simpat.IA é uma plataforma de estudos desenvolvida para os alunos e professores da **UNIFNAS**. O sistema usa inteligência artificial para gerar questões de múltipla escolha personalizadas com base no conteúdo das disciplinas do curso, tornando o processo de revisão e fixação de conteúdo mais dinâmico e eficiente.
-
----
-
-## O que é o projeto
-
-A plataforma funciona como um ciclo completo de aprendizagem:
-
-1. O **professor** cadastra as disciplinas e faz upload dos materiais em PDF.
-2. A **IA** (via Groq) lê o conteúdo desses materiais e gera questões inéditas a cada sessão.
-3. O **aluno** responde as questões, recebe feedback imediato e pode revisar o que errou com a ajuda de um assistente de IA.
-4. O **dashboard** exibe gráficos detalhados de evolução, aproveitamento por tema e desempenho por nível de dificuldade.
+> Versão 1.0 — Módulo: Quiz Inteligente UNIFNAS  
+> Usada como contexto estruturado nos prompts do agente de suporte.
 
 ---
 
-## Funcionalidades
+## 1. O QUE É O SIMPAT.IA QUIZ
 
-### Para o aluno
-- Cadastro por período letivo, com vínculo automático às disciplinas correspondentes
-- Geração de quizzes sob demanda — escolhe a matéria e quantas questões quer (1 a 20)
-- Resultado detalhado ao final de cada quiz com gabarito e explicações
-- Revisão guiada por IA: o aluno pode perguntar sobre qualquer questão que errou
-- Dashboard pessoal com 6 gráficos: aproveitamento por quiz, evolução no tempo, acertos vs erros, média por tema, erros por tema e desempenho por dificuldade
-- Chat de suporte integrado
+O Simpat.IA Quiz é um módulo da plataforma SIMPATIA que gera questões de múltipla escolha personalizadas com base nos materiais enviados pelo professor. O sistema usa IA (Groq API + LLaMA 3.3 70b) para criar questões inéditas a cada sessão de estudo.
 
-### Para o professor
-- Painel de controle com métricas gerais: total de alunos, disciplinas e vínculos
-- Cadastro e gerenciamento de disciplinas por período
-- Upload de PDFs que alimentam a base de conhecimento da IA
-- Visão do histórico de quizzes dos alunos
+**Perfis de usuário:**
+- **Aluno**: faz quizzes, visualiza resultados, acessa dashboard de evolução, usa o tutor de revisão.
+- **Professor**: cadastra disciplinas, faz upload de PDFs, acompanha métricas dos alunos.
 
 ---
 
-## Como a IA funciona
+## 2. FUNCIONALIDADES DO MÓDULO
 
-O conteúdo dos PDFs enviados pelo professor é extraído e enviado como contexto para o modelo de linguagem da **Groq**. A partir desse contexto, o modelo gera questões de múltipla escolha com 4 alternativas, gabarito e justificativa — tudo adaptado ao nível do material da disciplina.
+### 2.1 Geração de Quiz (aluno)
+- O aluno escolhe uma disciplina e define o número de questões (1 a 20).
+- A IA lê o conteúdo do PDF da disciplina e gera questões com 4 alternativas, gabarito e justificativa.
+- Cada sessão gera questões novas — não há banco fixo de questões.
 
-O mesmo modelo é usado no chat de revisão, onde o aluno pode tirar dúvidas sobre as questões que errou, recebendo explicações contextualizadas com base no conteúdo da prova que acabou de fazer.
+### 2.2 Resultado e Revisão (aluno)
+- Ao final do quiz, o aluno vê o gabarito com justificativas para cada questão.
+- O botão **"Por que errei?"** abre o Tutor de Revisão focado na questão específica.
+- O aluno pode conversar livremente com o tutor sobre qualquer questão do quiz.
 
----
+### 2.3 Dashboard (aluno)
+- 6 gráficos de desempenho: aproveitamento por quiz, evolução no tempo, acertos vs erros, média por tema, erros por tema, desempenho por dificuldade.
 
-## Perfis de acesso
-
-| Perfil | Descrição |
-|--------|-----------|
-| Aluno | Acesso via cadastro com e-mail e senha |
-| Professor | `pedro.professor@gmail.com` — acesso com permissões administrativas |
-
----
-
-## Stack
-
-- **Frontend:** React 18 + Vite + React Router + Chart.js
-- **Backend:** Node.js + Express + MySQL + JWT
-- **IA:** Groq API (LLaMA 3.3 70b)
-- **Upload:** Multer (PDFs das disciplinas)
+### 2.4 Gestão de Disciplinas (professor)
+- Cadastro de disciplinas vinculadas a períodos letivos.
+- Upload de PDFs que alimentam a IA.
+- Visualização de histórico de quizzes dos alunos.
 
 ---
 
-## Como rodar localmente
+## 3. AGENTES DE SUPORTE DO SISTEMA
 
-### Pré-requisitos
+O sistema possui três modos de agente, todos implementados em `backend/src/routes/chat.js`:
 
-Instale antes de começar:
-
-- [Node.js 18+](https://nodejs.org) — `node -v` para verificar
-- [MySQL 8+](https://dev.mysql.com/downloads/) ou [XAMPP](https://www.apachefriends.org/)
-- [Git](https://git-scm.com/)
-
----
-
-### 1. Clonar o repositório
-
-```bash
-git clone https://github.com/seu-usuario/atex-quiz-2026.git
-cd atex-quiz-2026
-```
+| Agente | Tipo | Quem usa | Contexto recebido |
+|---|---|---|---|
+| Assistente do Aluno | `aluno` | Aluno fora do quiz | Nenhum (suporte ao sistema) |
+| Assistente do Professor | `professor` | Professor | Nenhum (suporte ao sistema) |
+| Tutor de Revisão | `revisao` | Aluno após quiz | Array completo de questões com resultados |
 
 ---
 
-### 2. Criar o banco de dados
+## 4. PERGUNTAS FREQUENTES (FAQ)
 
-Abra o MySQL Workbench (ou phpMyAdmin no XAMPP) e execute o arquivo:
+### 4.1 Perguntas do Aluno — Uso do Sistema
 
-```
-backend/src/migrations/schema.sql
-```
+**P: Como faço um quiz?**
+R: Na tela inicial, clique em "Iniciar Quiz", escolha a disciplina, selecione o número de questões (1–20) e clique em "Gerar". A IA vai criar as questões na hora.
 
-Isso vai criar o banco `atex_quiz` com todas as tabelas necessárias.
+**P: Por que as questões são diferentes toda vez?**
+R: O sistema usa inteligência artificial para gerar questões novas em cada sessão, com base no conteúdo do PDF da disciplina. Não existe um banco de questões fixo.
 
----
+**P: Posso refazer o mesmo quiz?**
+R: Sim, mas as questões serão diferentes, pois são geradas dinamicamente pela IA a cada nova sessão.
 
-### 3. Configurar as variáveis de ambiente do backend
+**P: O que aparece no resultado?**
+R: Ao finalizar, você vê o gabarito completo com a alternativa correta e uma justificativa para cada questão.
 
-```bash
-cd backend
-cp .env.example .env
-```
+**P: Como funciona o "Por que errei?"**
+R: Ao clicar nesse botão em uma questão errada, o Tutor de Revisão abre automaticamente já focado naquela questão. Você pode continuar perguntando sobre qualquer outra questão da mesma sessão.
 
-Abra o `.env` e preencha:
+**P: O tutor de revisão responde dúvidas gerais sobre a matéria?**
+R: Não. O Tutor de Revisão responde apenas sobre as questões do quiz que você acabou de fazer. Para dúvidas gerais sobre o conteúdo, consulte o material da disciplina.
 
-```env
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=atex_quiz
-DB_USER=root
-DB_PASS=           # sua senha do MySQL (vazio se não tiver)
+**P: Meu quiz ficou carregando e não gerou as questões. O que faço?**
+R: Isso pode acontecer se o PDF da disciplina for muito grande ou se houver lentidão na conexão. Tente novamente. Se o problema persistir, avise seu professor.
 
-JWT_SECRET=qualquer_string_longa_e_aleatoria
+**P: Por que não aparecem disciplinas para eu fazer o quiz?**
+R: Você é vinculado às disciplinas pelo seu período letivo. Verifique se seu cadastro está com o período correto. Se o professor ainda não cadastrou PDFs para a disciplina, o quiz não pode ser gerado.
 
-GROQ_API_KEY=gsk_...   # obtenha em https://console.groq.com (gratuito)
+**P: O assistente do sistema não responde sobre conteúdo acadêmico. Por quê?**
+R: O assistente de suporte é focado em ajudar com o uso da plataforma. Para dúvidas de conteúdo, use o Tutor de Revisão (disponível após fazer um quiz).
 
-PORT=3001
-```
+### 4.2 Perguntas do Professor — Uso do Sistema
 
-> **Como obter a chave Groq:**
-> 1. Acesse [console.groq.com](https://console.groq.com)
-> 2. Crie uma conta gratuita
-> 3. Vá em **API Keys → Create API Key**
-> 4. Cole a chave no `.env`
+**P: Como cadastro uma disciplina?**
+R: Acesse o Painel do Professor, clique em "Nova Disciplina", preencha o nome e o período letivo.
 
----
+**P: Como faço o upload do material?**
+R: Na página de detalhes da disciplina, clique em "Enviar PDF". O arquivo deve estar em formato PDF. Após o upload, a IA já usa o conteúdo para gerar questões.
 
-### 4. Instalar dependências e rodar o backend
+**P: Posso enviar mais de um PDF por disciplina?**
+R: Sim. Cada PDF enviado é adicionado à base de conhecimento da disciplina. Quanto mais material, maior a variedade das questões geradas.
 
-```bash
-# dentro da pasta backend
-npm install
-npm run dev
-```
+**P: Como vejo o desempenho dos alunos?**
+R: No Painel do Professor, acesse a disciplina desejada para ver o histórico de quizzes dos alunos vinculados.
 
-O backend vai iniciar em `http://localhost:3001`.  
-Você deve ver: `Backend rodando em http://localhost:3001`
+**P: Um aluno não consegue ver a disciplina no quiz. O que pode ser?**
+R: Verifique se o período letivo do aluno no cadastro coincide com o período da disciplina. O vínculo é automático por período.
+
+**P: O sistema aceita PDFs com imagens ou tabelas?**
+R: O sistema extrai o texto do PDF. Imagens e tabelas sem texto não são processadas. Prefira PDFs com conteúdo textual.
 
 ---
 
-### 5. Instalar dependências e rodar o frontend
+## 5. ERROS COMUNS E SOLUÇÕES
 
-Abra um **novo terminal**:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-O frontend vai iniciar em `http://localhost:5173`.
+| Erro | Causa provável | Solução |
+|---|---|---|
+| "Erro ao gerar questões" | PDF sem texto legível ou API temporariamente indisponível | Verificar se o PDF tem texto selecionável; tentar novamente |
+| "Erro ao conectar com o assistente" | Timeout ou falha na API Groq | Aguardar e tentar novamente |
+| "Disciplina sem material" | Professor não enviou PDF | Professor deve fazer upload de PDF na disciplina |
+| Quiz não aparece para o aluno | Período letivo do aluno não coincide com a disciplina | Verificar período no cadastro do aluno |
+| Login inválido | Senha errada ou e-mail não cadastrado | Verificar credenciais; usar o e-mail informado no cadastro |
 
 ---
 
-### 6. Acessar o sistema
+## 6. LIMITAÇÕES DO SISTEMA
 
-Abra o navegador em **http://localhost:5173**
-
-**Primeiro acesso:**
-1. Clique em **Cadastrar** e crie uma conta de aluno
-2. Para acessar como professor, use o e-mail `pedro.professor@gmail.com` com a senha que você definir diretamente no banco
-
-> Para cadastrar o professor manualmente no banco:
-> ```sql
-> INSERT INTO alunos (nome, email, senha_hash, periodo)
-> VALUES ('Professor', 'pedro.professor@gmail.com', 'sua_senha', NULL);
-> ```
+- **Qualidade das questões depende do PDF**: PDFs escaneados sem OCR ou com baixo conteúdo textual geram questões de menor qualidade.
+- **Sem persistência das questões geradas**: cada sessão de quiz é única; não é possível recuperar questões de sessões anteriores.
+- **O tutor de revisão não tem memória entre sessões**: ao fechar e reabrir o chat, o contexto anterior é perdido.
+- **O assistente de suporte não responde sobre conteúdo acadêmico**: apenas sobre o funcionamento do sistema.
+- **Latência variável**: a geração de questões e as respostas do chat dependem da disponibilidade e velocidade da API Groq.
+- **Idioma**: o sistema opera exclusivamente em português.
 
 ---
 
-### Estrutura de pastas
+## 7. REGRAS DE COMPORTAMENTO DO AGENTE
 
-```
-atex-quiz-2026/
-├── frontend/          # React + Vite
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/
-│   │   └── services/
-│   └── public/        # imagens (logo, hero)
-│
-├── backend/           # Node.js + Express
-│   ├── src/
-│   │   ├── routes/    # auth, quiz, chat, dashboard, professor
-│   │   ├── middleware/
-│   │   ├── migrations/ # schema.sql + create_chat_logs.sql
-│   │   └── server.js
-│   ├── uploads/       # PDFs enviados pelo professor (criado automaticamente)
-│   └── .env.example
-│
-└── docs/              # Documentação técnica (ATEX)
-    ├── ARQUITETURA.md
-    ├── knowledge-base.md
-    └── TECNOLOGIAS.md
-```
-
----
-
-### Problemas comuns
-
-| Problema | Solução |
-|---|---|
-| `GROQ_API_KEY não configurada` | Verifique se o `.env` está na pasta `backend/` |
-| `Erro ao conectar com o banco` | Confirme que o MySQL está rodando e os dados do `.env` estão corretos |
-| `Cannot find module 'pdf-parse'` | Rode `npm install` dentro da pasta `backend/` |
-| Questões sobre "PDF" em vez do conteúdo | O PDF pode ser escaneado (imagem). Use PDFs com texto selecionável |
-| Frontend não conecta no backend | Confirme que o backend está rodando na porta 3001 |
+- Responder apenas sobre o uso do sistema Simpat.IA Quiz.
+- Não responder perguntas de conteúdo acadêmico (exceto o Tutor de Revisão, que é contextual ao quiz).
+- Ser claro, didático e encorajador.
+- Quando não souber responder, indicar que o usuário procure o professor ou o suporte técnico.
+- Nunca inventar funcionalidades que o sistema não possui.
+- Operar de forma ética: não emitir julgamentos negativos sobre o desempenho do aluno.
