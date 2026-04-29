@@ -46,7 +46,7 @@ O mesmo modelo é usado no chat de revisão, onde o aluno pode tirar dúvidas so
 | Perfil | Descrição |
 |--------|-----------|
 | Aluno | Acesso via cadastro com e-mail e senha |
-| Professor | Acesso via e-mail institucional fixo, com permissões administrativas |
+| Professor | `pedro.professor@gmail.com` — acesso com permissões administrativas |
 
 ---
 
@@ -54,5 +54,153 @@ O mesmo modelo é usado no chat de revisão, onde o aluno pode tirar dúvidas so
 
 - **Frontend:** React 18 + Vite + React Router + Chart.js
 - **Backend:** Node.js + Express + MySQL + JWT
-- **IA:** Groq API (modelos LLaMA)
+- **IA:** Groq API (LLaMA 3.3 70b)
 - **Upload:** Multer (PDFs das disciplinas)
+
+---
+
+## Como rodar localmente
+
+### Pré-requisitos
+
+Instale antes de começar:
+
+- [Node.js 18+](https://nodejs.org) — `node -v` para verificar
+- [MySQL 8+](https://dev.mysql.com/downloads/) ou [XAMPP](https://www.apachefriends.org/)
+- [Git](https://git-scm.com/)
+
+---
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/seu-usuario/atex-quiz-2026.git
+cd atex-quiz-2026
+```
+
+---
+
+### 2. Criar o banco de dados
+
+Abra o MySQL Workbench (ou phpMyAdmin no XAMPP) e execute o arquivo:
+
+```
+backend/src/migrations/schema.sql
+```
+
+Isso vai criar o banco `atex_quiz` com todas as tabelas necessárias.
+
+---
+
+### 3. Configurar as variáveis de ambiente do backend
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Abra o `.env` e preencha:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=atex_quiz
+DB_USER=root
+DB_PASS=           # sua senha do MySQL (vazio se não tiver)
+
+JWT_SECRET=qualquer_string_longa_e_aleatoria
+
+GROQ_API_KEY=gsk_...   # obtenha em https://console.groq.com (gratuito)
+
+PORT=3001
+```
+
+> **Como obter a chave Groq:**
+> 1. Acesse [console.groq.com](https://console.groq.com)
+> 2. Crie uma conta gratuita
+> 3. Vá em **API Keys → Create API Key**
+> 4. Cole a chave no `.env`
+
+---
+
+### 4. Instalar dependências e rodar o backend
+
+```bash
+# dentro da pasta backend
+npm install
+npm run dev
+```
+
+O backend vai iniciar em `http://localhost:3001`.  
+Você deve ver: `Backend rodando em http://localhost:3001`
+
+---
+
+### 5. Instalar dependências e rodar o frontend
+
+Abra um **novo terminal**:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O frontend vai iniciar em `http://localhost:5173`.
+
+---
+
+### 6. Acessar o sistema
+
+Abra o navegador em **http://localhost:5173**
+
+**Primeiro acesso:**
+1. Clique em **Cadastrar** e crie uma conta de aluno
+2. Para acessar como professor, use o e-mail `pedro.professor@gmail.com` com a senha que você definir diretamente no banco
+
+> Para cadastrar o professor manualmente no banco:
+> ```sql
+> INSERT INTO alunos (nome, email, senha_hash, periodo)
+> VALUES ('Professor', 'pedro.professor@gmail.com', 'sua_senha', NULL);
+> ```
+
+---
+
+### Estrutura de pastas
+
+```
+atex-quiz-2026/
+├── frontend/          # React + Vite
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   └── services/
+│   └── public/        # imagens (logo, hero)
+│
+├── backend/           # Node.js + Express
+│   ├── src/
+│   │   ├── routes/    # auth, quiz, chat, dashboard, professor
+│   │   ├── middleware/
+│   │   ├── migrations/ # schema.sql + create_chat_logs.sql
+│   │   └── server.js
+│   ├── uploads/       # PDFs enviados pelo professor (criado automaticamente)
+│   └── .env.example
+│
+└── docs/              # Documentação técnica (ATEX)
+    ├── ARQUITETURA.md
+    ├── knowledge-base.md
+    └── TECNOLOGIAS.md
+```
+
+---
+
+### Problemas comuns
+
+| Problema | Solução |
+|---|---|
+| `GROQ_API_KEY não configurada` | Verifique se o `.env` está na pasta `backend/` |
+| `Erro ao conectar com o banco` | Confirme que o MySQL está rodando e os dados do `.env` estão corretos |
+| `Cannot find module 'pdf-parse'` | Rode `npm install` dentro da pasta `backend/` |
+| Questões sobre "PDF" em vez do conteúdo | O PDF pode ser escaneado (imagem). Use PDFs com texto selecionável |
+| Frontend não conecta no backend | Confirme que o backend está rodando na porta 3001 |

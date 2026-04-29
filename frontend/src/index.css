@@ -5,30 +5,67 @@
 }
 
 :root {
+  /* paleta principal */
   --azul: #006FFF;
+  --azul-dark: #0052cc;
+  --azul-soft: #e8f1ff;
   --roxo: #370199;
+  --roxo-dark: #2a0177;
+  --roxo-soft: #f1eaff;
+
+  /* gradiente da marca */
+  --grad-marca: linear-gradient(135deg, #370199 0%, #006FFF 100%);
+  --grad-marca-suave: linear-gradient(135deg, #f1eaff 0%, #e8f1ff 100%);
+
+  /* neutros */
   --branco: #ffffff;
-  --cinza-bg: #f4f4f9;
+  --cinza-bg: #f6f7fb;
+  --cinza-50: #f9fafb;
+  --cinza-100: #f3f4f6;
   --cinza-200: #e5e7eb;
   --cinza-300: #d1d5db;
+  --cinza-400: #9ca3af;
+  --cinza-500: #6b7280;
   --cinza-600: #4b5563;
+  --cinza-700: #374151;
   --cinza-800: #1f2937;
+  --cinza-900: #111827;
+
+  /* feedback */
   --verde: #10b981;
+  --verde-soft: #ecfdf5;
+  --amarelo: #f59e0b;
+  --amarelo-soft: #fffbeb;
   --vermelho: #ef4444;
-  --sombra: 0 4px 16px rgba(0,0,0,.10);
+  --vermelho-soft: #fef2f2;
+
+  /* sombras */
+  --sombra-xs: 0 1px 2px rgba(15, 23, 42, .06);
+  --sombra-sm: 0 2px 8px rgba(15, 23, 42, .06);
+  --sombra: 0 4px 16px rgba(15, 23, 42, .08);
+  --sombra-md: 0 8px 24px rgba(15, 23, 42, .10);
+  --sombra-lg: 0 16px 40px rgba(15, 23, 42, .12);
+
+  /* outros */
+  --radius-sm: 8px;
   --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --transicao: .2s cubic-bezier(.4, 0, .2, 1);
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--cinza-bg);
   color: var(--cinza-800);
   min-height: 100vh;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button {
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   cursor: pointer;
 }
 
@@ -38,5 +75,18 @@ a {
 }
 
 input, select, textarea {
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
+}
+
+/* scrollbar global suave */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--cinza-300); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--cinza-400); background-clip: padding-box; border: 2px solid transparent; }
+
+/* foco acessível padrão */
+:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

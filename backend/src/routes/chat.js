@@ -1,12 +1,11 @@
 const express = require('express');
 const axios = require('axios');
 const { authMiddleware } = require('../middleware/auth');
+const pool = require('../db');
 
 const router = express.Router();
 
 function buildRevisaoPrompt(contexto) {
-  // contexto.questoes = array de todas as questões com resultado
-  // contexto.questaoFoco = número (1-based) da questão clicada, ou null
   const questoesStr = (contexto.questoes || []).map(q => {
     const alts = (q.alternativas || [])
       .map((a, j) => `  ${String.fromCharCode(65 + j)}) ${a}`)
@@ -43,6 +42,17 @@ Quando o aluno perguntar sobre uma questão (pelo número ou conteúdo):
 Use linguagem clara, didática e encorajadora. Responda em português.`;
 }
 
+async function salvarLog(userId, tipo, pergunta, resposta, latenciaMs) {
+  try {
+    await pool.execute(
+      'INSERT INTO chat_logs (user_id, tipo, pergunta, resposta, latencia_ms) VALUES (?, ?, ?, ?, ?)',
+      [userId, tipo, pergunta, resposta.slice(0, 5000), latenciaMs]
+    );
+  } catch (err) {
+    console.error('[chat_logs] Falha ao salvar log:', err.message);
+  }
+}
+
 router.post('/', authMiddleware, async (req, res) => {
   const { pergunta, tipo, contexto } = req.body;
   const apiKey = process.env.GROQ_API_KEY || '';
@@ -68,6 +78,9 @@ NÃO responda perguntas de conteúdo acadêmico. Se perguntarem, diga: 'Eu ajudo
 Seja claro, direto e didático.`;
   }
 
+  const tipoLog = tipo === 'revisao' ? 'revisao' : ehProfessor ? 'professor' : 'aluno';
+  const inicio = Date.now();
+
   try {
     const { data } = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
@@ -87,10 +100,23 @@ Seja claro, direto e didático.`;
     );
 
     const resposta = data.choices?.[0]?.message?.content || 'Sem resposta.';
+    const latencia = Date.now() - inicio;
+
+    await salvarLog(req.user.id, tipoLog, pergunta.trim(), resposta, latencia);
+
     res.json({ resposta });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ erro: 'Erro ao consultar IA.' });
+    const latencia = Date.now() - inicio;
+    const mensagemErro = err.response?.data?.error?.message || err.message || 'Erro desconhecido';
+
+    console.error(`[chat] Erro na requisição Groq (${latencia}ms):`, mensagemErro);
+    await salvarLog(req.user.id, tipoLog, pergunta.trim(), `[ERRO] ${mensagemErro}`, latencia);
+
+    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+      return res.status(504).json({ erro: 'O assistente demorou para responder. Tente novamente.' });
+    }
+
+    res.status(500).json({ erro: 'Erro ao consultar IA. Tente novamente em instantes.' });
   }
 });
 

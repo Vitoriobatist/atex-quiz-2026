@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const pdfParse = require('pdf-parse');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 
@@ -25,13 +25,17 @@ function limpaConteudo(texto, limite = 12000) {
   return texto.slice(0, limite);
 }
 
-function extraiTextoArquivo(caminho, limite = 12000) {
+async function extraiTextoArquivo(caminho, limite = 12000) {
   const ext = path.extname(caminho).toLowerCase();
   let texto = '';
   if (ext === '.pdf') {
     try {
-      texto = execSync(`pdftotext -layout -enc UTF-8 "${caminho}" -`, { timeout: 10000 }).toString();
-    } catch {}
+      const buffer = fs.readFileSync(caminho);
+      const resultado = await pdfParse(buffer);
+      texto = resultado.text || '';
+    } catch (err) {
+      console.error(`[pdf-parse] Falha ao extrair "${caminho}":`, err.message);
+    }
   }
   if (!texto) {
     try { texto = fs.readFileSync(caminho, 'utf8'); } catch {}
@@ -96,10 +100,17 @@ router.post('/gerar', authMiddleware, async (req, res) => {
     const arquivos = fs.readdirSync(pastaMateria).filter(f =>
       fs.statSync(path.join(pastaMateria, f)).isFile()
     );
-    let limiteRestante = 12000;
+    // usa só os primeiros 4000 chars de cada arquivo — suficiente para contexto
+    // sem consumir tokens demais e deixar espaço para a resposta da IA
+    const LIMITE_POR_ARQUIVO = 4000;
+    const LIMITE_TOTAL = 8000;
+    let limiteRestante = LIMITE_TOTAL;
     for (const nomeArq of arquivos) {
       if (limiteRestante <= 0) break;
-      const texto = extraiTextoArquivo(path.join(pastaMateria, nomeArq), limiteRestante);
+      const texto = await extraiTextoArquivo(
+        path.join(pastaMateria, nomeArq),
+        Math.min(LIMITE_POR_ARQUIVO, limiteRestante)
+      );
       if (texto) {
         conteudoBase += (conteudoBase ? '\n\n---\n\n' : '') + texto;
         limiteRestante -= texto.length;
@@ -118,8 +129,14 @@ router.post('/gerar', authMiddleware, async (req, res) => {
   let temaEfetivo = '';
 
   if (conteudoBase) {
-    temaEfetivo = 'OS CONTEÚDOS E CONCEITOS DESCRITOS NO TEXTO DA MATÉRIA ABAIXO.';
-    contextoArquivo = `\nCONTEÚDO DA MATÉRIA:\n"""\n${conteudoBase}\n"""\n`;
+    temaEfetivo = materiaRaw;
+    contextoArquivo = `
+CONTEXTO DA MATÉRIA (trecho inicial do material didático — use para identificar os temas, conceitos e terminologias abordados):
+"""
+${conteudoBase}
+"""
+Com base nos temas e conceitos identificados nesse contexto, gere questões sobre a disciplina "${materiaRaw}".
+`;
   } else {
     temaEfetivo = materiaRaw || tema || 'Conhecimentos Gerais';
   }
@@ -148,7 +165,7 @@ Formato de cada item:
 }`;
 
   try {
-    const maxTokens = Math.min(3500, 220 * qtd + 400);
+    const maxTokens = Math.min(8000, 450 * qtd + 600);
     const { data } = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
@@ -169,7 +186,19 @@ Formato de cada item:
     let raw = (data.choices?.[0]?.message?.content || '').trim();
     raw = raw.replace(/^```(?:json)?\s*|\s*```$/gm, '');
 
-    let questoes = JSON.parse(raw);
+    // tenta corrigir JSON truncado fechando o array no último objeto completo
+    let questoes;
+    try {
+      questoes = JSON.parse(raw);
+    } catch {
+      const ultimoFechamento = raw.lastIndexOf('}');
+      if (ultimoFechamento !== -1) {
+        const recuperado = raw.slice(0, ultimoFechamento + 1) + ']';
+        questoes = JSON.parse(recuperado);
+      } else {
+        throw new Error('JSON inválido na resposta da IA.');
+      }
+    }
     if (!Array.isArray(questoes)) throw new Error('Resposta não é array');
 
     // normaliza índices
