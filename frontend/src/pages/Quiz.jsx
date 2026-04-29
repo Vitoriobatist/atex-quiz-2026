@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import {useEffect } from 'react';
+import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Quiz.css';
@@ -17,10 +19,11 @@ export default function Quiz() {
   const [enviando, setEnviando]   = useState(false);
   const [erro, setErro]           = useState('');
 
-  if (questoes.length === 0) {
-    navigate('/');
-    return null;
-  }
+  useEffect(() => {
+    if (questoes.length === 0) {
+      navigate('/');
+    }
+  }, [questoes, navigate]);
 
   function selecionar(questaoIdx, altIdx) {
     setRespostas(r => {
@@ -29,6 +32,13 @@ export default function Quiz() {
       return novo;
     });
   }
+
+  const nivelMap = {
+    facil: 1,
+    medio: 2,
+    dificil: 3,
+    superior: 4
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -40,7 +50,7 @@ export default function Quiz() {
         respostas,
         tema,
         materia_id,
-        nivel,
+        nivel: nivelMap[nivel],
         nivelRotulo: nivelLabel,
       });
       navigate('/resultado', { state: { ...data, questoes, respostas, tema, nivelLabel } });
@@ -54,8 +64,14 @@ export default function Quiz() {
   return (
     <div className="quiz-page">
       <header className="quiz-topbar">
-        <img src="/logo-simpatia.png" alt="Simpat.IA" className="quiz-topbar__logo"
-          onError={e => { e.target.style.display = 'none'; }} />
+        <Link to="/">
+          <img
+            src="/logo-simpatia.png"
+            alt="Simpat.IA"
+            className="quiz-topbar__logo"
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        </Link>
       </header>
 
       <div className="quiz-container">

@@ -54,7 +54,7 @@ export default function Home() {
 
       <div className="home-hero">
         <div className="home-hero__inner">
-          <img src="/frase.png" alt="" className="home-hero__frase"
+          <img src="/frase1.png" alt="" className="home-hero__frase"
             onError={e => { e.target.style.display = 'none'; }} />
           <img src="/logo-bola.png" alt="" className="home-hero__bola"
             onError={e => { e.target.style.display = 'none'; }} />

@@ -30,6 +30,7 @@ export default function Header() {
     <header className="app-header">
       <img
         src="/logo-simpatia.png"
+        
         alt="Simpat.IA"
         className="app-header__logo"
         onError={e => { e.target.style.display = 'none'; }}
